@@ -11,7 +11,9 @@ const Header = ({
 }) => {
   const handleStart = () => {
     setIsStarted(true);
+    localStorage.setItem("isStarted", "true");
     setStage(1);
+    localStorage.setItem("stage", "1");
   };
 
   return (

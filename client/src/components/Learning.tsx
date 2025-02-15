@@ -9,7 +9,10 @@ const Learning = ({
   stage: number;
   setStage: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-  const handleNext = () => setStage(2);
+  const handleNext = () => {
+    setStage(2);
+    localStorage.setItem("stage", String(2));
+  };
 
   return (
     <>

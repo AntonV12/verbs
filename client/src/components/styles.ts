@@ -1,14 +1,22 @@
 import styled from "styled-components";
 
+export const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 export const StyledHeader = styled.header`
   position: relative;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export const Logo = styled.div`
   position: absolute;
   top: 5px;
-  left: 50px;
+  left: 2%;
 
   img {
     display: block;
@@ -29,6 +37,8 @@ export const H1 = styled.h1`
   font-family: "Times New Roman";
   font-size: 50px;
   font-weight: normal;
+  width: 50%;
+  text-align: center;
 `;
 
 export const About = styled.div`
@@ -55,13 +65,19 @@ export const Start = styled.button`
 `;
 
 export const Main = styled.main`
-  width: 800px;
+  width: min(100%, 800px);
   margin: 0 auto 50px;
   position: relative;
 
   .process {
-    position: absolute;
-    top: 15px;
+    @media screen and (max-width: 600px) {
+      text-align: end;
+    }
+    @media screen and (min-width: 600px) {
+      position: absolute;
+      top: 15px;
+    }
+
     right: 0;
     font-family: Arial;
     font-size: 15px;
@@ -126,6 +142,7 @@ export const Main = styled.main`
     input.en {
       font-weight: bold;
       text-align: right;
+      width: 90%;
     }
 
     input.ru {
@@ -140,10 +157,10 @@ export const Main = styled.main`
 
     .button {
       margin-left: 7px;
-      padding: 15px 30px;
+      padding: 15px 25px;
       font-family: Tahoma;
       font-size: 18px;
-
+      width: 236px;
       color: #3d593d;
       background-color: #d6f1d6;
       border: 1px solid green;
@@ -187,5 +204,23 @@ export const Main = styled.main`
         border: 2px solid #0bacbc;
       }
     }
+    .missed {
+      text-decoration: red wavy underline;
+    }
   }
+`;
+
+export const Loader = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+export const TheEnd = styled.div`
+  margin-top: 50px;
+  text-align: center;
+  font-family: Arial;
+  font-size: 16px;
+  color: #645555;
 `;

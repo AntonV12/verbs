@@ -1,40 +1,105 @@
 import { VerbType } from "../App";
-import { useState, useRef } from "react";
+import { useState } from "react";
 
-function getRandomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const Span = ({ verb, wrongs, isChecking }: { verb: VerbType; wrongs: Set<number>; isChecking: boolean }) => {
+  const isMissed = wrongs.has(verb.id);
 
-const Retelling = ({ verbs }: { verbs: VerbType[] }) => {
+  return (
+    <span key={verb.id} className={isMissed && isChecking ? "missed" : ""}>
+      {verb.examples.join(". ") + ". "}
+    </span>
+  );
+};
+
+const Retelling = ({
+  verbs,
+  portion,
+  setPortion,
+  setStage,
+  rightVerbs,
+  setRightVerbs,
+  wrongVerbs,
+  setWrongVerbs,
+  portionsHistory,
+  setPortionsHistory,
+}: {
+  verbs: VerbType[];
+  portion: number;
+  setPortion: React.Dispatch<React.SetStateAction<number>>;
+  setStage: React.Dispatch<React.SetStateAction<number>>;
+  rightVerbs: number[];
+  setRightVerbs: React.Dispatch<React.SetStateAction<number[]>>;
+  wrongVerbs: number[];
+  setWrongVerbs: React.Dispatch<React.SetStateAction<number[]>>;
+  portionsHistory: { rightVerbs: number[]; wrongVerbs: number[] }[];
+  setPortionsHistory: React.Dispatch<React.SetStateAction<{ rightVerbs: number[]; wrongVerbs: number[] }[]>>;
+}) => {
   const [isShowArea, setIsShowArea] = useState<boolean>(false);
   const [isShowText, setIsShowText] = useState<boolean>(true);
-  const randomInt = getRandomInt(0, verbs.length - 1);
   const [textValue, setTextValue] = useState<string>("");
-  const [isAllRight, setIsAllRight] = useState<boolean | null>(null);
-  const ref = useRef<HTMLParagraphElement>(null);
+  const [isGoAhead, setIsGoAhead] = useState<boolean | null>(null);
+  const [wrongs, setWrongs] = useState<Set<number>>(new Set());
+  const [isChecking, setIsChecking] = useState<boolean>(false);
 
   const handleReady = () => {
     setIsShowArea(true);
     setIsShowText(false);
   };
 
-  const handleLook = () => setIsShowText(!isShowText);
+  const handleLook = () => {
+    setIsShowText(true);
+  };
 
   const handleCheck = () => {
     setIsShowText(true);
+    setIsChecking(true);
 
-    if (verbs[randomInt].translates.some((t) => textValue.includes(t))) {
-      setIsAllRight(true);
-    } else {
-      if (ref.current) {
-        ref.current.style.textDecoration = "red wavy underline";
+    const newRights = new Set<number>();
+    const newWrongs = new Set<number>();
+
+    verbs.forEach((verb) => {
+      if (
+        verb.examples.some((example) => textValue.toLowerCase().trim().includes(example.toLowerCase().trim())) ||
+        verb.examples.length === 0
+      ) {
+        newRights.add(verb.id);
+      } else {
+        newWrongs.add(verb.id);
+        setWrongs(newWrongs);
       }
-    }
-  };
+    });
 
-  const handleFocus = () => {
-    if (ref.current) {
-      ref.current.style.textDecoration = "none";
+    setIsGoAhead(true);
+
+    if (isGoAhead) {
+      const newPortion = portion + 1;
+      setPortion(newPortion);
+      localStorage.setItem("portion", newPortion.toString());
+
+      const updatedRightVerbs = [...rightVerbs, ...Array.from(newRights)];
+      const updatedWrongVerbs = [...wrongVerbs, ...Array.from(newWrongs)];
+
+      setRightVerbs(updatedRightVerbs);
+      setWrongVerbs(updatedWrongVerbs);
+
+      if (portion % 5 !== 0) {
+        const newPortionsHistory = [
+          ...portionsHistory,
+          {
+            rightVerbs: Array.from(newRights),
+            wrongVerbs: Array.from(newWrongs),
+          },
+        ];
+        setPortionsHistory(newPortionsHistory);
+        localStorage.setItem("portionsHistory", JSON.stringify(newPortionsHistory));
+      }
+
+      localStorage.setItem("rightVerbs", JSON.stringify(updatedRightVerbs));
+      localStorage.setItem("wrongVerbs", JSON.stringify(updatedWrongVerbs));
+
+      setIsChecking(false);
+      setStage(1);
+      localStorage.setItem("stage", "1");
     }
   };
 
@@ -44,17 +109,16 @@ const Retelling = ({ verbs }: { verbs: VerbType[] }) => {
       <p className="task">Выучи текст, а затем перескажи его:</p>
       <div className="retail">
         {isShowText && (
-          <p className="text" ref={ref}>
-            {verbs[randomInt].examples.join(". ")}
+          <p className="text">
+            {verbs
+              .filter((verb) => verb.examples.length > 0)
+              .map((verb) => (
+                <Span key={verb.id} verb={verb} wrongs={wrongs} isChecking={isChecking} />
+              ))}
           </p>
         )}
         {isShowArea && (
-          <textarea
-            className="textarea"
-            value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
-            onFocus={handleFocus}
-          ></textarea>
+          <textarea className="textarea" value={textValue} onChange={(e) => setTextValue(e.target.value)}></textarea>
         )}
       </div>
       <div className="control">
@@ -65,7 +129,7 @@ const Retelling = ({ verbs }: { verbs: VerbType[] }) => {
           подсмотреть текст
         </button>
         <button className="button" onClick={handleCheck}>
-          проверить пересказ
+          {isGoAhead ? "далее" : "проверить пересказ"}
         </button>
       </div>
     </>

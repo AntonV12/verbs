@@ -1,11 +1,27 @@
 import { VerbType } from "../App";
 import { useState, useEffect } from "react";
 
+function arraysMatch(arr1: string[], arr2: string[]): boolean {
+  return arr1.every((word) =>
+    arr2.some((str) =>
+      str
+        .split(", ")
+        .map((s) => s.trim())
+        .includes(word)
+    )
+  );
+}
+
 const Cell = ({ mode, verb }: { mode: "en" | "ru"; verb: VerbType }) => {
   const [inputValue, setInputValue] = useState<string>("");
+  //const ref = useRef(null);
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.style.removeProperty("background-color");
   };
 
   useEffect(() => {
@@ -18,7 +34,7 @@ const Cell = ({ mode, verb }: { mode: "en" | "ru"; verb: VerbType }) => {
         {mode === "en" ? (
           <>
             <td>
-              <input type="text" className={mode} value={inputValue} onChange={onInputChange} />
+              <input type="text" className={mode} value={inputValue} onChange={onInputChange} onFocus={handleFocus} />
             </td>
             <td>{verb.translates.join(", ")}</td>
           </>
@@ -26,7 +42,7 @@ const Cell = ({ mode, verb }: { mode: "en" | "ru"; verb: VerbType }) => {
           <>
             <td>{verb.verb}</td>
             <td>
-              <input type="text" className={mode} value={inputValue} onChange={onInputChange} />
+              <input type="text" className={mode} value={inputValue} onChange={onInputChange} onFocus={handleFocus} />
             </td>
           </>
         )}
@@ -64,6 +80,7 @@ const ControlButton = ({
       if (isAllRight) {
         setIsAllRight(false);
         setStage(3);
+        localStorage.setItem("stage", String(3));
       }
     }
   };
@@ -85,8 +102,6 @@ const Training = ({
   const [mode, setMode] = useState<"en" | "ru">("en");
   const [isAllRight, setIsAllRight] = useState<boolean>(false);
 
-  console.log(verbs);
-
   const handleCheck = (verbs: VerbType[], mode: "en" | "ru") => {
     const inputs: HTMLInputElement[] = Array.from(document.querySelectorAll("input[type='text']"));
 
@@ -100,7 +115,7 @@ const Training = ({
           input.style.backgroundColor = "red";
         }
       } else {
-        if (verbs[index].translates.map((t) => t.split(", ").includes(value)).includes(true)) {
+        if (arraysMatch(value.split(", "), verbs[index].translates)) {
           input.style.backgroundColor = "green";
         } else {
           input.style.backgroundColor = "red";

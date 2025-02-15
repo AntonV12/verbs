@@ -3,6 +3,7 @@ import { parseFileContent } from "../middlewares/parseFileContent.js";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
+import { shuffle } from "../middlewares/shuffleArray.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -13,7 +14,7 @@ export const parseVerbs = async (req, res) => {
     const filePath = path.join(__dirname, "verbs");
     const files = await fs.promises.readdir(filePath);
 
-    for (const file of files) {
+    for (const file of shuffle(files)) {
       const fileContent = await fs.promises.readFile(path.join(filePath, file), "utf-8");
 
       const parsedData = parseFileContent(fileContent);
