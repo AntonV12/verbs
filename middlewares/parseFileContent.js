@@ -28,7 +28,7 @@ export const parseFileContent = (content) => {
       if (currentVerb) {
         const existingVerb = verbsData.find((v) => v.verb === currentVerb);
         if (existingVerb) {
-          existingVerb.examples.push(example[0].toUpperCase() + example.slice(1).replace(/(?<=.+)\.+/g, ""));
+          existingVerb.examples.push(example[0].toUpperCase() + example.slice(1).replace(/(?<=.+)\.+$/, ""));
         }
       }
     }

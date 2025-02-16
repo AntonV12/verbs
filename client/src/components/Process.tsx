@@ -1,9 +1,15 @@
-const Process = ({ portion }: { portion: number }) => {
-  if (portion % 5 !== 0) {
+import { StyledProcess } from "./styles";
+
+const Process = ({ portion, lastVerb, isStarted }: { portion: number; lastVerb: number; isStarted: boolean }) => {
+  const currentPortion = portion + 1;
+
+  if (portion % 5 !== 0 || isStarted) {
     return (
-      <div className="process">
-        порция <span>{portion + 1}</span> из <span>40</span>
-      </div>
+      <>
+        <StyledProcess>
+          <span>{currentPortion}</span> / <span>{lastVerb}</span>
+        </StyledProcess>
+      </>
     );
   }
 };

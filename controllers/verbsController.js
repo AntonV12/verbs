@@ -14,16 +14,24 @@ export const parseVerbs = async (req, res) => {
     const filePath = path.join(__dirname, "verbs");
     const files = await fs.promises.readdir(filePath);
 
-    for (const file of shuffle(files)) {
+    const result = [];
+
+    for (const file of files) {
       const fileContent = await fs.promises.readFile(path.join(filePath, file), "utf-8");
 
       const parsedData = parseFileContent(fileContent);
 
       for (const elem of parsedData) {
         const { verb, translates, examples } = elem;
-        await pool.execute(sql, [verb, JSON.stringify(translates), JSON.stringify(examples)]);
+
+        const res = examples.flatMap((sentence) => sentence.split(".")).map((sentence) => sentence.trim());
+        result.push({ verb, translates, examples: res });
       }
     }
+
+    shuffle(result).forEach((item) => {
+      pool.execute(sql, [item.verb, JSON.stringify(item.translates), JSON.stringify(item.examples)]);
+    });
 
     res.status(200).json({ message: "Data inserted successfully" });
   } catch (err) {

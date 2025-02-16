@@ -14,6 +14,11 @@ export type VerbType = {
   examples: string[];
 };
 
+type portionHistoryType = {
+  rightVerbs: number[];
+  wrongVerbs: number[];
+};
+
 const shuffle = (array: VerbType[]): VerbType[] => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -32,25 +37,24 @@ function App() {
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [stage, setStage] = useState<number>(0);
   const [portion, setPortion] = useState<number>(0);
-  const limit: number = 2;
+  const limit: number = 18;
   const [wordsList, setWordsList] = useState<VerbType[]>([]);
-  const [rightVerbs, setRightVerbs] = useState<number[]>([]);
-  const [wrongVerbs, setWrongVerbs] = useState<number[]>([]);
-  const [portionsHistory, setPortionsHistory] = useState<{ rightVerbs: number[]; wrongVerbs: number[] }[]>([]);
+  const [portionsHistory, setPortionsHistory] = useState<portionHistoryType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [lastVerb, setLastVerb] = useState<number>(
+    Math.ceil(
+      verbs.length / limit + portionsHistory.reduce((acc, portion) => acc + portion.wrongVerbs.length, 0) / limit
+    )
+  );
 
   useEffect(() => {
     const savedPortion = localStorage.getItem("portion");
     const savedStage = localStorage.getItem("stage");
-    const savedRightVerbs = localStorage.getItem("rightVerbs");
-    const savedWrongVerbs = localStorage.getItem("wrongVerbs");
     const savedPortionHistory = localStorage.getItem("portionsHistory");
     const savedIsStarted = localStorage.getItem("isStarted");
 
     if (savedPortion) setPortion(Number(savedPortion));
     if (savedStage) setStage(Number(savedStage));
-    if (savedRightVerbs) setRightVerbs(JSON.parse(savedRightVerbs));
-    if (savedWrongVerbs) setWrongVerbs(JSON.parse(savedWrongVerbs));
     if (savedPortionHistory) setPortionsHistory(JSON.parse(savedPortionHistory));
     if (savedIsStarted) setIsStarted(JSON.parse(savedIsStarted));
 
@@ -63,9 +67,12 @@ function App() {
     if (portion === 0) {
       setWordsList(verbs.slice(0, limit));
     } else if (portion % 5 !== 0) {
-      const newWordsList = verbs.filter((verb) => !rightVerbs.includes(verb.id)).slice(0, limit);
+      const newWordsList = verbs
+        .filter((verb) => !portionsHistory.some((portion) => portion.rightVerbs.includes(verb.id)))
+        .slice(0, limit);
 
       setWordsList(newWordsList);
+      setLastVerb((prev) => Math.ceil((verbs.length + prev) / limit));
     } else {
       alert("Контрольная работа");
 
@@ -79,8 +86,9 @@ function App() {
       const newWordsList = shuffle(verbs.filter((verb) => verbsFromLastFivePortions.has(verb.id)));
 
       setWordsList(newWordsList);
+      setLastVerb((prev) => Math.ceil((verbs.length + prev) / limit));
     }
-  }, [portion, limit, rightVerbs, wrongVerbs, verbs, portionsHistory]);
+  }, [portion, limit, verbs, portionsHistory]);
 
   const renderContent = () => {
     if (stage === 1) {
@@ -98,10 +106,6 @@ function App() {
           portion={portion}
           setPortion={setPortion}
           setStage={setStage}
-          rightVerbs={rightVerbs}
-          setRightVerbs={setRightVerbs}
-          wrongVerbs={wrongVerbs}
-          setWrongVerbs={setWrongVerbs}
           portionsHistory={portionsHistory}
           setPortionsHistory={setPortionsHistory}
         />
@@ -117,10 +121,12 @@ function App() {
   return (
     <Wrapper>
       <Header isStarted={isStarted} setIsStarted={setIsStarted} setStage={setStage} />
-      <Main>
-        <Process portion={portion} />
-        {renderContent()}
-      </Main>
+      {isStarted && (
+        <Main>
+          <Process portion={portion} lastVerb={lastVerb} isStarted={isStarted} />
+          {renderContent()}
+        </Main>
+      )}
     </Wrapper>
   );
 }
