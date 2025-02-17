@@ -1,16 +1,7 @@
 import { VerbType } from "../App";
 import { useState } from "react";
 
-const Span = ({
-  verb,
-  wrongs,
-
-  isChecking,
-}: {
-  verb: VerbType;
-  wrongs: Set<number>;
-  isChecking: boolean;
-}) => {
+const Span = ({ verb, wrongs, isChecking }: { verb: VerbType; wrongs: Set<number>; isChecking: boolean }) => {
   const isMissed = wrongs.has(verb.id);
 
   return (
@@ -25,10 +16,6 @@ const Retelling = ({
   portion,
   setPortion,
   setStage,
-  // rightVerbs,
-  // setRightVerbs,
-  // wrongVerbs,
-  // setWrongVerbs,
   portionsHistory,
   setPortionsHistory,
 }: {
@@ -36,10 +23,6 @@ const Retelling = ({
   portion: number;
   setPortion: React.Dispatch<React.SetStateAction<number>>;
   setStage: React.Dispatch<React.SetStateAction<number>>;
-  // rightVerbs: number[];
-  // setRightVerbs: React.Dispatch<React.SetStateAction<number[]>>;
-  // wrongVerbs: number[];
-  // setWrongVerbs: React.Dispatch<React.SetStateAction<number[]>>;
   portionsHistory: { rightVerbs: number[]; wrongVerbs: number[] }[];
   setPortionsHistory: React.Dispatch<React.SetStateAction<{ rightVerbs: number[]; wrongVerbs: number[] }[]>>;
 }) => {
@@ -56,7 +39,7 @@ const Retelling = ({
   };
 
   const handleLook = () => {
-    setIsShowText(true);
+    setIsShowText(!isShowText);
   };
 
   const handleCheck = () => {
@@ -85,13 +68,6 @@ const Retelling = ({
       setPortion(newPortion);
       localStorage.setItem("portion", newPortion.toString());
 
-      //const updatedRightVerbs = [...rightVerbs, ...Array.from(newRights)];
-      //const updatedWrongVerbs = [...wrongVerbs, ...Array.from(newWrongs)];
-
-      //setRightVerbs(updatedRightVerbs);
-      //setWrongVerbs(updatedWrongVerbs);
-
-      //if (portion % 5 !== 0) {
       const newPortionsHistory = [
         ...portionsHistory,
         {
@@ -101,10 +77,6 @@ const Retelling = ({
       ];
       setPortionsHistory(newPortionsHistory);
       localStorage.setItem("portionsHistory", JSON.stringify(newPortionsHistory));
-      //}
-
-      //localStorage.setItem("rightVerbs", JSON.stringify(updatedRightVerbs));
-      //localStorage.setItem("wrongVerbs", JSON.stringify(updatedWrongVerbs));
 
       setIsChecking(false);
       setStage(1);
@@ -138,10 +110,10 @@ const Retelling = ({
         ) : (
           <>
             <button className="button" onClick={handleLook}>
-              подсмотреть текст
+              {isShowText ? "скрыть текст" : "подсмотреть текст"}
             </button>
             <button className="button" onClick={handleCheck}>
-              {isGoAhead ? "верно, далее" : "проверить пересказ"}
+              {isGoAhead ? "далее" : "проверить пересказ"}
             </button>
           </>
         )}

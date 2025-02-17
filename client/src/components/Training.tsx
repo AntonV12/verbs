@@ -12,9 +12,8 @@ function arraysMatch(arr1: string[], arr2: string[]): boolean {
   );
 }
 
-const Cell = ({ mode, verb }: { mode: "en" | "ru"; verb: VerbType }) => {
+const Cell = ({ mode, verb, firstElemId }: { mode: "en" | "ru"; verb: VerbType; firstElemId: number }) => {
   const [inputValue, setInputValue] = useState<string>("");
-  //const ref = useRef(null);
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
@@ -34,7 +33,14 @@ const Cell = ({ mode, verb }: { mode: "en" | "ru"; verb: VerbType }) => {
         {mode === "en" ? (
           <>
             <td>
-              <input type="text" className={mode} value={inputValue} onChange={onInputChange} onFocus={handleFocus} />
+              <input
+                type="text"
+                className={mode}
+                value={inputValue}
+                onChange={onInputChange}
+                onFocus={handleFocus}
+                autoFocus={verb.id === firstElemId}
+              />
             </td>
             <td>{verb.translates.join(", ")}</td>
           </>
@@ -42,7 +48,14 @@ const Cell = ({ mode, verb }: { mode: "en" | "ru"; verb: VerbType }) => {
           <>
             <td>{verb.verb}</td>
             <td>
-              <input type="text" className={mode} value={inputValue} onChange={onInputChange} onFocus={handleFocus} />
+              <input
+                type="text"
+                className={mode}
+                value={inputValue}
+                onChange={onInputChange}
+                onFocus={handleFocus}
+                autoFocus={verb.id === firstElemId}
+              />
             </td>
           </>
         )}
@@ -101,6 +114,7 @@ const Training = ({
 }) => {
   const [mode, setMode] = useState<"en" | "ru">("en");
   const [isAllRight, setIsAllRight] = useState<boolean>(false);
+  const firstElemId = Math.min(...verbs.map((verb) => verb.id));
 
   const handleCheck = (verbs: VerbType[], mode: "en" | "ru") => {
     const inputs: HTMLInputElement[] = Array.from(document.querySelectorAll("input[type='text']"));
@@ -110,20 +124,20 @@ const Training = ({
 
       if (mode === "en") {
         if (value === verbs[index].verb) {
-          input.style.backgroundColor = "green";
+          input.style.backgroundColor = "#d6f1d6";
         } else {
-          input.style.backgroundColor = "red";
+          input.style.backgroundColor = "#f73838";
         }
       } else {
         if (arraysMatch(value.split(", "), verbs[index].translates)) {
-          input.style.backgroundColor = "green";
+          input.style.backgroundColor = "#d6f1d6";
         } else {
-          input.style.backgroundColor = "red";
+          input.style.backgroundColor = "#f73838";
         }
       }
     });
 
-    if (inputs.every((input) => input.style.backgroundColor === "green")) {
+    if (inputs.every((input) => input.style.backgroundColor === "#d6f1d6")) {
       setIsAllRight(true);
     }
   };
@@ -136,7 +150,7 @@ const Training = ({
       <table className="table">
         <tbody>
           {verbs.map((verb) => {
-            return <Cell key={verb.id} mode={mode} verb={verb} />;
+            return <Cell key={verb.id} mode={mode} verb={verb} firstElemId={firstElemId} />;
           })}
         </tbody>
       </table>

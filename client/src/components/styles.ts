@@ -31,7 +31,7 @@ export const Logo = styled.div`
 `;
 
 export const H1 = styled.h1`
-  margin-top: 0;
+  margin-top: 20px;
   margin-bottom: 20px;
   font-size: 50px;
   font-weight: normal;
@@ -149,6 +149,7 @@ export const Main = styled.main`
       font-size: 17px;
       border: 2px solid gray;
       transition: 1s ease all;
+      border-radius: 3px;
 
       &:focus {
         outline: none;
@@ -224,7 +225,7 @@ export const Main = styled.main`
       }
     }
     .missed {
-      text-decoration: red wavy underline;
+      text-decoration: #f73838 wavy underline;
     }
   }
 `;
