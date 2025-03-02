@@ -1,12 +1,22 @@
 import { VerbType } from "../App";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const Span = ({ verb, wrongs, isChecking }: { verb: VerbType; wrongs: Set<number>; isChecking: boolean }) => {
   const isMissed = wrongs.has(verb.id);
 
+  //const lastSign = verb.examples[verb.examples.length - 1].slice(-1);
+  const res = verb.examples.map((example) => {
+    if (example.endsWith("?") || example.endsWith("!")) {
+      return example + " ";
+    } else {
+      return example + ". ";
+    }
+  });
+
   return (
     <span key={verb.id} className={isMissed && isChecking ? "missed" : ""}>
-      {verb.examples.join(". ") + ". "}
+      {/* {verb.examples.join(". ") + (/[!?]/.test(lastSign) ? "" : ".") + " "} */}
+      {res.join("")}
     </span>
   );
 };
@@ -32,6 +42,20 @@ const Retelling = ({
   const [isGoAhead, setIsGoAhead] = useState<boolean | null>(null);
   const [wrongs, setWrongs] = useState<Set<number>>(new Set());
   const [isChecking, setIsChecking] = useState<boolean>(false);
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [areaHeight, setAreaHeight] = useState<number>(0);
+
+  useEffect(() => {
+    if (ref.current) {
+      const observer = new ResizeObserver(() => {
+        setAreaHeight(ref.current!.clientHeight);
+      });
+
+      observer.observe(ref.current);
+
+      return () => observer.disconnect();
+    }
+  }, []);
 
   const handleReady = () => {
     setIsShowArea(true);
@@ -88,18 +112,24 @@ const Retelling = ({
     <>
       <h2>Режим пересказа</h2>
       <p className="task">Выучи текст, а затем перескажи его:</p>
-      <div className="retail">
-        {isShowText && (
-          <p className="text">
-            {verbs
-              .filter((verb) => verb.examples.length > 0)
-              .map((verb) => (
-                <Span key={verb.id} verb={verb} wrongs={wrongs} isChecking={isChecking} />
-              ))}
-          </p>
-        )}
+      <div className="retail" style={{ height: `${areaHeight + 30}px` }}>
+        {/* {isShowText && ( */}
+        <p ref={ref} className={`text ${isShowText ? "show" : "hide"}`}>
+          {verbs
+            .filter((verb) => verb.examples.length > 0)
+            .map((verb) => (
+              <Span key={verb.id} verb={verb} wrongs={wrongs} isChecking={isChecking} />
+            ))}
+        </p>
+        {/*  )} */}
         {isShowArea && (
-          <textarea className="textarea" value={textValue} onChange={(e) => setTextValue(e.target.value)}></textarea>
+          <textarea
+            className="textarea"
+            style={{ height: `${areaHeight + 4}px` }}
+            value={textValue}
+            onChange={(e) => setTextValue(e.target.value)}
+            autoFocus
+          ></textarea>
         )}
       </div>
       <div className="control">

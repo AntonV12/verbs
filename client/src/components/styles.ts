@@ -54,15 +54,20 @@ export const About = styled.div`
 export const Start = styled.button`
   padding: 25px 80px;
   font-size: 20px;
-  color: #3d593d;
-  background-color: #d6f1d6;
-  border: 1px solid green;
+  color: white;
+  background: linear-gradient(to right bottom, #45548f, #fc5656);
+  border: none;
   border-radius: 3px;
-  transition: 1s ease all;
+  transition: all 0.5s ease;
 
   &:hover {
+    box-shadow: 0 1px 10px 1px #b8b8b8;
     cursor: pointer;
-    background-color: #c6e5c6;
+    transform: translate(-1px, -1px);
+  }
+
+  &:active {
+    background: linear-gradient(to bottom, #263a8b, #f73838);
   }
 `;
 
@@ -197,27 +202,47 @@ export const Main = styled.main`
 
   .retail {
     margin-bottom: 10px;
+    position: relative;
+    height: fit-content;
 
     .text {
-      margin-top: 0;
-      border: 1px dashed gray;
+      margin: 0; 
+      border: 2px dashed gray;
       padding: 10px;
       text-align: justify;
       font-size: 18px;
       line-height: 1.3;
+      position: absolute;
+      top: 0;
+      background-color: #fff;
+      opacity: 0;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      z-index: 1;
+    }
+
+    .show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hide {
+      opacity: 0;
+      visibility: hidden;
     }
 
     .textarea {
       text-align: justify;
       font-size: 18px;
       font-family: "Inter", serif;
+      line-height: 1.3;
       padding: 10px;
       width: 100%;
-      height: 200px;
       box-sizing: border-box;
       border: 2px solid gray;
-      transition: 1s ease all;
-      resize: vertical;
+      transition: 1s ease border-color;
+      resize: none;
+      position: absolute;
+      top: 0;
 
       &:focus {
         outline: none;
@@ -225,7 +250,8 @@ export const Main = styled.main`
       }
     }
     .missed {
-      text-decoration: #f73838 wavy underline;
+      text-decoration: #f73838 underline;
+      background-color: #ffcbcb;
     }
   }
 `;

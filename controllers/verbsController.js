@@ -24,7 +24,7 @@ export const parseVerbs = async (req, res) => {
       for (const elem of parsedData) {
         const { verb, translates, examples } = elem;
 
-        const res = examples.flatMap((sentence) => sentence.split(".")).map((sentence) => sentence.trim());
+        const res = examples.flatMap((sentence) => sentence.split(". ")).map((sentence) => sentence.trim());
         result.push({ verb, translates, examples: res });
       }
     }
