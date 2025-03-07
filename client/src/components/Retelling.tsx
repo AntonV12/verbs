@@ -1,24 +1,33 @@
 import { VerbType } from "../App";
 import { useState, useRef, useEffect } from "react";
 
-const Span = ({ verb, wrongs, isChecking }: { verb: VerbType; wrongs: Set<number>; isChecking: boolean }) => {
-  const isMissed = wrongs.has(verb.id);
-
-  //const lastSign = verb.examples[verb.examples.length - 1].slice(-1);
+const Span = ({
+  verb,
+  isChecking,
+  textValue,
+}: {
+  verb: VerbType;
+  isChecking: boolean;
+  textValue: string;
+}) => {
   const res = verb.examples.map((example) => {
+    const isMissed = !textValue.toLowerCase().includes(example.toLowerCase());
     if (example.endsWith("?") || example.endsWith("!")) {
-      return example + " ";
+      return (
+        <span key={example} className={isMissed && isChecking ? "missed" : ""}>
+          {example + " "}
+        </span>
+      );
     } else {
-      return example + ". ";
+      return (
+        <span key={example} className={isMissed && isChecking ? "missed" : ""}>
+          {example + ". "}
+        </span>
+      );
     }
   });
 
-  return (
-    <span key={verb.id} className={isMissed && isChecking ? "missed" : ""}>
-      {/* {verb.examples.join(". ") + (/[!?]/.test(lastSign) ? "" : ".") + " "} */}
-      {res.join("")}
-    </span>
-  );
+  return <>{res}</>;
 };
 
 const Retelling = ({
@@ -26,21 +35,23 @@ const Retelling = ({
   portion,
   setPortion,
   setStage,
-  portionsHistory,
-  setPortionsHistory,
-}: {
+  setIsExam,
+}: // portionsHistory,
+// setPortionsHistory,
+{
   verbs: VerbType[];
   portion: number;
   setPortion: React.Dispatch<React.SetStateAction<number>>;
   setStage: React.Dispatch<React.SetStateAction<number>>;
-  portionsHistory: { rightVerbs: number[]; wrongVerbs: number[] }[];
-  setPortionsHistory: React.Dispatch<React.SetStateAction<{ rightVerbs: number[]; wrongVerbs: number[] }[]>>;
+  setIsExam: React.Dispatch<React.SetStateAction<boolean>>;
+  // portionsHistory: { rightVerbs: number[]; wrongVerbs: number[] }[];
+  // setPortionsHistory: React.Dispatch<React.SetStateAction<{ rightVerbs: number[]; wrongVerbs: number[] }[]>>;
 }) => {
   const [isShowArea, setIsShowArea] = useState<boolean>(false);
   const [isShowText, setIsShowText] = useState<boolean>(true);
   const [textValue, setTextValue] = useState<string>("");
   const [isGoAhead, setIsGoAhead] = useState<boolean | null>(null);
-  const [wrongs, setWrongs] = useState<Set<number>>(new Set());
+  //const [wrongs, setWrongs] = useState<Set<number>>(new Set());
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const ref = useRef<HTMLParagraphElement>(null);
   const [areaHeight, setAreaHeight] = useState<number>(0);
@@ -70,37 +81,47 @@ const Retelling = ({
     setIsShowText(true);
     setIsChecking(true);
 
-    const newRights = new Set<number>();
-    const newWrongs = new Set<number>();
+    // const newRights = new Set<number>();
+    // const newWrongs = new Set<number>();
 
-    verbs.forEach((verb) => {
-      if (
-        verb.examples.every((example) => textValue.toLowerCase().trim().includes(example.toLowerCase().trim())) ||
-        verb.examples.length === 0
-      ) {
-        newRights.add(verb.id);
-      } else {
-        newWrongs.add(verb.id);
-        setWrongs(newWrongs);
-      }
-    });
+    // verbs.forEach((verb) => {
+    //   if (
+    //     verb.examples.every((example) =>
+    //       textValue.toLowerCase().trim().includes(example.toLowerCase().trim())
+    //     ) ||
+    //     verb.examples.length === 0
+    //   ) {
+    //     newRights.add(verb.id);
+    //   } else {
+    //     newWrongs.add(verb.id);
+    //     //setWrongs(newWrongs);
+    //   }
+    // });
 
     setIsGoAhead(true);
 
     if (isGoAhead) {
-      const newPortion = portion + 1;
-      setPortion(newPortion);
-      localStorage.setItem("portion", newPortion.toString());
+      if (portion % 4 !== 0) {
+        const newPortion = portion + 1;
+        setPortion(newPortion);
+        localStorage.setItem("portion", newPortion.toString());
+      } else {
+        setIsExam(true);
+        const newPortion = portion;
+        setPortion(newPortion);
+        localStorage.setItem("portion", newPortion.toString());
+      }
 
-      const newPortionsHistory = [
-        ...portionsHistory,
-        {
-          rightVerbs: Array.from(newRights),
-          wrongVerbs: Array.from(newWrongs),
-        },
-      ];
-      setPortionsHistory(newPortionsHistory);
-      localStorage.setItem("portionsHistory", JSON.stringify(newPortionsHistory));
+      // const newPortionsHistory = [
+      //   ...portionsHistory,
+      //   {
+      //     rightVerbs: Array.from(newRights),
+      //     wrongVerbs: Array.from(newWrongs),
+      //   },
+      // ];
+
+      //setPortionsHistory(newPortionsHistory);
+      //localStorage.setItem("portionsHistory", JSON.stringify(newPortionsHistory));
 
       setIsChecking(false);
       setStage(1);
@@ -118,7 +139,7 @@ const Retelling = ({
           {verbs
             .filter((verb) => verb.examples.length > 0)
             .map((verb) => (
-              <Span key={verb.id} verb={verb} wrongs={wrongs} isChecking={isChecking} />
+              <Span key={verb.id} verb={verb} isChecking={isChecking} textValue={textValue} />
             ))}
         </p>
         {/*  )} */}

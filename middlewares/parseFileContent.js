@@ -5,7 +5,7 @@ export const parseFileContent = (content) => {
 
   for (let line of lines) {
     if (!line.startsWith("\t")) {
-      const match = line.match(/^([\w+\s*\.*\(*\)*]+)\s+(.+)$/);
+      const match = line.match(/^([\w+\s*\.*\(*\)*\'*!\/\-,]+)*\s*(.*)$/);
 
       if (match) {
         const verb = match[1].trim();
@@ -28,7 +28,13 @@ export const parseFileContent = (content) => {
       if (currentVerb) {
         const existingVerb = verbsData.find((v) => v.verb === currentVerb);
         if (existingVerb) {
-          existingVerb.examples.push(example[0].toUpperCase() + example.slice(1).replace(/(?<=.+)\.+$/, ""));
+          existingVerb.examples.push(
+            example[0].toUpperCase() +
+              example
+                .slice(1)
+                .replace(/(?<=.+)\.+$/, "")
+                .replace(/[а-я]/gi, "")
+          );
         }
       }
     }

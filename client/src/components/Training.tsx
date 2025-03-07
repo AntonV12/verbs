@@ -124,20 +124,20 @@ const Training = ({
 
       if (mode === "en") {
         if (value === verbs[index].verb) {
-          input.style.backgroundColor = "#d6f1d6";
+          input.style.backgroundColor = "rgb(97, 228, 51)";
         } else {
-          input.style.backgroundColor = "#f73838";
+          input.style.backgroundColor = "rgb(252, 86, 86)";
         }
       } else {
         if (arraysMatch(value.split(", "), verbs[index].translates)) {
-          input.style.backgroundColor = "#d6f1d6";
+          input.style.backgroundColor = "rgb(97, 228, 51)";
         } else {
-          input.style.backgroundColor = "#f73838";
+          input.style.backgroundColor = "rgb(252, 86, 86)";
         }
       }
     });
 
-    if (inputs.every((input) => input.style.backgroundColor === "#d6f1d6")) {
+    if (inputs.every((input) => input.style.backgroundColor === "rgb(97, 228, 51)")) {
       setIsAllRight(true);
     }
   };

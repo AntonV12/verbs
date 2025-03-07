@@ -14,19 +14,19 @@ export type VerbType = {
   examples: string[];
 };
 
-type portionHistoryType = {
-  rightVerbs: number[];
-  wrongVerbs: number[];
-};
+// type portionHistoryType = {
+//   rightVerbs: number[];
+//   wrongVerbs: number[];
+// };
 
-const shuffle = (array: VerbType[]): VerbType[] => {
+/* const shuffle = (array: VerbType[]): VerbType[] => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
 
   return array;
-};
+}; */
 
 const fetchVerbs = fetch("/verbs/fetch")
   .then((res) => res.json())
@@ -36,26 +36,31 @@ function App() {
   const verbs: VerbType[] = use(fetchVerbs);
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [stage, setStage] = useState<number>(0);
-  const [portion, setPortion] = useState<number>(0);
+  const [portion, setPortion] = useState<number>(1);
   const limit: number = 18;
   const [wordsList, setWordsList] = useState<VerbType[]>([]);
-  const [portionsHistory, setPortionsHistory] = useState<portionHistoryType[]>([]);
+  //const [portionsHistory, setPortionsHistory] = useState<portionHistoryType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [lastVerb, setLastVerb] = useState<number>(
-    Math.ceil(
-      verbs.length / limit + portionsHistory.reduce((acc, portion) => acc + portion.wrongVerbs.length, 0) / limit
-    )
-  );
+  const lastVerb: number = verbs.length / limit;
+  const [isExam, setIsExam] = useState<boolean>(false);
+
+  //const [lastVerb, setLastVerb] = useState<number>(verbs.length / limit);
+  //   Math.ceil(
+  //     verbs.length / limit +
+  //       portionsHistory.reduce((acc, portion) => acc + portion.wrongVerbs.length, 0) / limit
+  //     //portionsHistory[portionsHistory.length - 1]?.wrongVerbs.length
+  //   )
+  // );
 
   useEffect(() => {
     const savedPortion = localStorage.getItem("portion");
     const savedStage = localStorage.getItem("stage");
-    const savedPortionHistory = localStorage.getItem("portionsHistory");
+    //const savedPortionHistory = localStorage.getItem("portionsHistory");
     const savedIsStarted = localStorage.getItem("isStarted");
 
     if (savedPortion) setPortion(Number(savedPortion));
     if (savedStage) setStage(Number(savedStage));
-    if (savedPortionHistory) setPortionsHistory(JSON.parse(savedPortionHistory));
+    //if (savedPortionHistory) setPortionsHistory(JSON.parse(savedPortionHistory));
     if (savedIsStarted) setIsStarted(JSON.parse(savedIsStarted));
 
     setIsLoading(false);
@@ -64,31 +69,41 @@ function App() {
   useEffect(() => {
     if (!verbs) return;
 
-    if (portion === 0) {
+    /* if (portion === 0) {
       setWordsList(verbs.slice(0, limit));
-    } else if (portion % 5 !== 0) {
+    } */ /* else if (portion % 5 !== 0) {
       const newWordsList = verbs
         .filter((verb) => !portionsHistory.some((portion) => portion.rightVerbs.includes(verb.id)))
         .slice(0, limit);
 
       setWordsList(newWordsList);
-      setLastVerb((prev) => Math.ceil((verbs.length + prev) / limit));
+    } */
+
+    if (!isExam) {
+      const start: number = (portion - 1) * (limit + 1) - (portion - 1);
+      const finish: number = start + limit;
+      console.log(start, finish);
+      setWordsList(verbs.slice(start, finish));
     } else {
       alert("Контрольная работа");
 
-      const lastFivePortions = portionsHistory.slice(-5);
-      const verbsFromLastFivePortions = new Set<number>();
-      lastFivePortions.forEach((portion) => {
-        portion.rightVerbs.forEach((verbId) => verbsFromLastFivePortions.add(verbId));
-        portion.wrongVerbs.forEach((verbId) => verbsFromLastFivePortions.add(verbId));
-      });
+      // const lastFivePortions = portionsHistory.slice(-5);
+      // const verbsFromLastFivePortions = new Set<number>();
+      // lastFivePortions.forEach((portion) => {
+      //   portion.rightVerbs.forEach((verbId) => verbsFromLastFivePortions.add(verbId));
+      //   portion.wrongVerbs.forEach((verbId) => verbsFromLastFivePortions.add(verbId));
+      // });
 
-      const newWordsList = shuffle(verbs.filter((verb) => verbsFromLastFivePortions.has(verb.id)));
+      // const newWordsList = shuffle(verbs.filter((verb) => verbsFromLastFivePortions.has(verb.id)));
 
-      setWordsList(newWordsList);
-      setLastVerb((prev) => Math.ceil((verbs.length + prev) / limit));
+      // setWordsList(newWordsList);
+      const start = (portion - 5) * (limit + 1);
+      const finish = start + limit * 4;
+      setWordsList(verbs.slice(start, finish));
+      console.log("start", start);
+      console.log("finish", finish);
     }
-  }, [portion, limit, verbs, portionsHistory]);
+  }, [portion, limit, verbs, isExam /* , portionsHistory */]);
 
   const renderContent = () => {
     if (stage === 1) {
@@ -106,8 +121,9 @@ function App() {
           portion={portion}
           setPortion={setPortion}
           setStage={setStage}
-          portionsHistory={portionsHistory}
-          setPortionsHistory={setPortionsHistory}
+          setIsExam={setIsExam}
+          // portionsHistory={portionsHistory}
+          // setPortionsHistory={setPortionsHistory}
         />
       );
     }

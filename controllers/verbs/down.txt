@@ -491,7 +491,7 @@ ease down уменьшать напряжение усилие
 
 escalate down смягчать (конфликт)
 
-face down осадить запугать
+face down осадить, запугать
 	The speaker faced his opponent down.
 
 fade down понижать постепенно (звук)

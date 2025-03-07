@@ -43,6 +43,10 @@ export const H1 = styled.h1`
   -webkit-background-clip: text;
   -ms-background-clip: text;
   color: transparent;
+
+  @media screen and (max-width: 600px) {
+    font-size: 30px;
+  }
 `;
 
 export const About = styled.div`
@@ -51,9 +55,7 @@ export const About = styled.div`
   color: #645555;
 `;
 
-export const Start = styled.button`
-  padding: 25px 80px;
-  font-size: 20px;
+export const Button = styled.button`
   color: white;
   background: linear-gradient(to right bottom, #45548f, #fc5656);
   border: none;
@@ -69,6 +71,11 @@ export const Start = styled.button`
   &:active {
     background: linear-gradient(to bottom, #263a8b, #f73838);
   }
+`;
+
+export const Start = styled(Button)`
+  padding: 25px 80px;
+  font-size: 20px;
 `;
 
 export const StyledProcess = styled.div`
@@ -100,6 +107,10 @@ export const Main = styled.main`
     text-align: center;
     font-size: 37px;
     color: #242121;
+
+    @media screen and (max-width: 600px) {
+      font-size: 25px;
+    }
   }
 
   .task {
@@ -130,7 +141,43 @@ export const Main = styled.main`
 
     tr:nth-child(6n) td {
       border-bottom: 20px solid transparent;
-    } 
+    }
+
+    tr:nth-child(12n+1),
+    tr:nth-child(12n+2),
+    tr:nth-child(12n+3),
+    tr:nth-child(12n+4),
+    tr:nth-child(12n+5),
+    tr:nth-child(12n+6) {
+      background-color:rgba(69, 84, 143, 0.06);
+    }
+
+    tr:nth-child(12n+7),
+    tr:nth-child(12n+8),
+    tr:nth-child(12n+9),
+    tr:nth-child(12n+10),
+    tr:nth-child(12n+11),
+    tr:nth-child(12n+12) {
+      background-color: #ffffff;
+    }
+
+    tr:nth-child(12n+1) td {
+      &:first-child {
+        border-radius: 10px 0 0 0;
+      }
+      &:last-child {
+        border-radius: 0 10px 0 0;
+      }
+    }
+
+    tr:nth-child(12n+6) td {
+      &:first-child {
+        border-radius: 0 0 0 10px;
+      }
+      &:last-child {
+        border-radius: 0 0 10px 0;
+      }
+    }
 
     td {
       padding: 15px 10px;

@@ -34,6 +34,7 @@ export const parseVerbs = async (req, res) => {
     });
 
     res.status(200).json({ message: "Data inserted successfully" });
+    //res.send(result);
   } catch (err) {
     console.error("Ошибка:", err);
     res.status(500).json({ error: "Ошибка сервера" });
