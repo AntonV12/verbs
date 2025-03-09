@@ -24,8 +24,12 @@ export const parseVerbs = async (req, res) => {
       for (const elem of parsedData) {
         const { verb, translates, examples } = elem;
 
-        const res = examples.flatMap((sentence) => sentence.split(". ")).map((sentence) => sentence.trim());
-        result.push({ verb, translates, examples: res });
+        const examplesRes = examples.flatMap((sentence) => sentence.split(". ")).map((sentence) => sentence.trim());
+        const translatesRes = translates
+          .map((translate) => translate.split(", "))
+          .flat()
+          .map((translate) => translate.trim());
+        result.push({ verb, translates: translatesRes, examples: examplesRes });
       }
     }
 
@@ -34,7 +38,6 @@ export const parseVerbs = async (req, res) => {
     });
 
     res.status(200).json({ message: "Data inserted successfully" });
-    //res.send(result);
   } catch (err) {
     console.error("Ошибка:", err);
     res.status(500).json({ error: "Ошибка сервера" });
@@ -42,10 +45,20 @@ export const parseVerbs = async (req, res) => {
 };
 
 export const getVerbs = async (req, res) => {
-  try {
-    const [results] = await pool.execute("SELECT * FROM verbs");
+  const { limit, portion, isExam } = req.query;
 
-    res.status(200).json(results);
+  try {
+    const length = await pool.execute("SELECT COUNT(*) as count FROM verbs");
+    if (isExam) {
+      const minus = +portion - 5;
+      const start = (+portion - 5) * (+limit + 1) - minus;
+      const [results] = await pool.execute(`SELECT * FROM verbs LIMIT ${limit * 5} OFFSET ${start}`);
+
+      res.status(200).json({ results, length: length[0][0].count });
+    } else {
+      const [results] = await pool.execute(`SELECT * FROM verbs LIMIT ${limit} OFFSET ${limit * (portion - 1)}`);
+      res.status(200).json({ results, length: length[0][0].count });
+    }
   } catch (err) {
     console.error("Ошибка:", err);
     res.status(500).json({ error: "Ошибка сервера" });

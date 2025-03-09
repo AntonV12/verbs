@@ -1,26 +1,18 @@
 import { VerbType } from "../App";
 import { useState, useRef, useEffect } from "react";
 
-const Span = ({
-  verb,
-  isChecking,
-  textValue,
-}: {
-  verb: VerbType;
-  isChecking: boolean;
-  textValue: string;
-}) => {
+const Span = ({ verb, isChecking, textValue }: { verb: VerbType; isChecking: boolean; textValue: string }) => {
   const res = verb.examples.map((example) => {
     const isMissed = !textValue.toLowerCase().includes(example.toLowerCase());
     if (example.endsWith("?") || example.endsWith("!")) {
       return (
-        <span key={example} className={isMissed && isChecking ? "missed" : ""}>
+        <span key={example} className={isChecking ? (isMissed ? "missed" : "correct") : ""}>
           {example + " "}
         </span>
       );
     } else {
       return (
-        <span key={example} className={isMissed && isChecking ? "missed" : ""}>
+        <span key={example} className={isChecking ? (isMissed ? "missed" : "correct") : ""}>
           {example + ". "}
         </span>
       );
@@ -35,23 +27,22 @@ const Retelling = ({
   portion,
   setPortion,
   setStage,
+  isExam,
   setIsExam,
-}: // portionsHistory,
-// setPortionsHistory,
-{
+  setHashedVerbs,
+}: {
   verbs: VerbType[];
   portion: number;
   setPortion: React.Dispatch<React.SetStateAction<number>>;
   setStage: React.Dispatch<React.SetStateAction<number>>;
+  isExam: boolean;
   setIsExam: React.Dispatch<React.SetStateAction<boolean>>;
-  // portionsHistory: { rightVerbs: number[]; wrongVerbs: number[] }[];
-  // setPortionsHistory: React.Dispatch<React.SetStateAction<{ rightVerbs: number[]; wrongVerbs: number[] }[]>>;
+  setHashedVerbs: React.Dispatch<React.SetStateAction<VerbType[]>>;
 }) => {
   const [isShowArea, setIsShowArea] = useState<boolean>(false);
   const [isShowText, setIsShowText] = useState<boolean>(true);
   const [textValue, setTextValue] = useState<string>("");
   const [isGoAhead, setIsGoAhead] = useState<boolean | null>(null);
-  //const [wrongs, setWrongs] = useState<Set<number>>(new Set());
   const [isChecking, setIsChecking] = useState<boolean>(false);
   const ref = useRef<HTMLParagraphElement>(null);
   const [areaHeight, setAreaHeight] = useState<number>(0);
@@ -80,48 +71,27 @@ const Retelling = ({
   const handleCheck = () => {
     setIsShowText(true);
     setIsChecking(true);
-
-    // const newRights = new Set<number>();
-    // const newWrongs = new Set<number>();
-
-    // verbs.forEach((verb) => {
-    //   if (
-    //     verb.examples.every((example) =>
-    //       textValue.toLowerCase().trim().includes(example.toLowerCase().trim())
-    //     ) ||
-    //     verb.examples.length === 0
-    //   ) {
-    //     newRights.add(verb.id);
-    //   } else {
-    //     newWrongs.add(verb.id);
-    //     //setWrongs(newWrongs);
-    //   }
-    // });
-
     setIsGoAhead(true);
 
     if (isGoAhead) {
-      if (portion % 4 !== 0) {
+      if (portion % 5 !== 0) {
         const newPortion = portion + 1;
         setPortion(newPortion);
         localStorage.setItem("portion", newPortion.toString());
+        localStorage.setItem("isExam", "false");
       } else {
-        setIsExam(true);
-        const newPortion = portion;
-        setPortion(newPortion);
-        localStorage.setItem("portion", newPortion.toString());
+        if (isExam) {
+          setPortion(portion + 1);
+          localStorage.setItem("portion", String(portion + 1));
+          setIsExam(false);
+          localStorage.setItem("isExam", "false");
+          localStorage.setItem("hashedVerbs", JSON.stringify([]));
+          setHashedVerbs([]);
+        } else {
+          setIsExam(true);
+          localStorage.setItem("isExam", "true");
+        }
       }
-
-      // const newPortionsHistory = [
-      //   ...portionsHistory,
-      //   {
-      //     rightVerbs: Array.from(newRights),
-      //     wrongVerbs: Array.from(newWrongs),
-      //   },
-      // ];
-
-      //setPortionsHistory(newPortionsHistory);
-      //localStorage.setItem("portionsHistory", JSON.stringify(newPortionsHistory));
 
       setIsChecking(false);
       setStage(1);
@@ -134,7 +104,6 @@ const Retelling = ({
       <h2>Режим пересказа</h2>
       <p className="task">Выучи текст, а затем перескажи его:</p>
       <div className="retail" style={{ height: `${areaHeight + 30}px` }}>
-        {/* {isShowText && ( */}
         <p ref={ref} className={`text ${isShowText ? "show" : "hide"}`}>
           {verbs
             .filter((verb) => verb.examples.length > 0)
@@ -142,7 +111,6 @@ const Retelling = ({
               <Span key={verb.id} verb={verb} isChecking={isChecking} textValue={textValue} />
             ))}
         </p>
-        {/*  )} */}
         {isShowArea && (
           <textarea
             className="textarea"

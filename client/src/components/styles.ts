@@ -78,14 +78,20 @@ export const Start = styled(Button)`
   font-size: 20px;
 `;
 
+export const MainHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
 export const StyledProcess = styled.div`
-  @media screen and (max-width: 600px) {
+  /* @media screen and (max-width: 600px) {
     text-align: end;
   }
   @media screen and (min-width: 600px) {
     position: absolute;
     top: 15px;
-  }
+  } */
 
   right: 10px;
   font-size: 15px;
@@ -93,7 +99,7 @@ export const StyledProcess = styled.div`
 `;
 
 export const Main = styled.main`
-  width: min(80%, 800px);
+  width: min(80%, 1200px);
   margin: 0 auto 50px;
   position: relative;
   background: #fff;
@@ -252,6 +258,8 @@ export const Main = styled.main`
     position: relative;
     height: fit-content;
 
+    
+
     .text {
       margin: 0; 
       border: 2px dashed gray;
@@ -300,6 +308,11 @@ export const Main = styled.main`
       text-decoration: #f73838 underline;
       background-color: #ffcbcb;
     }
+    
+    .correct {
+      text-decoration: #28a745 underline;
+      background-color: #d4edda;
+    }
   }
 `;
 
@@ -315,4 +328,102 @@ export const TheEnd = styled.div`
   text-align: center;
   font-size: 16px;
   color: #645555;
+`;
+
+export const ResetButton = styled.div`
+  color: #645555;
+
+  &:hover {
+    cursor: pointer;
+    color: #f73838;
+  }
+`;
+
+export const Confirm = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(69, 84, 143, 0.71);
+  z-index: 2;
+
+  .confirm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 360px;
+    height: 120px;
+    padding: 10px;
+    background-color:rgb(218, 225, 255);
+    text-align: center;
+    border-radius: 10px;
+
+    p {
+      margin: 0 0 20px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 0 5px;
+  }
+`;
+
+export const Alert = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(69, 84, 143, 0.71);
+  z-index: 2;
+
+  div {
+    width: 360px;
+    height: 120px;
+    padding: 10px;
+    background-color:rgb(218, 225, 255);
+    text-align: center;
+    border-radius: 10px;
+
+    
+
+    button {
+      padding: 10px 20px;
+      margin: 0 5px;
+  
+  }
+`;
+
+export const Tooltip = styled.div`
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  top: -44px;
+  left: -27px;
+  width: 100px;
+  background-color: #45548f1c;
+  z-index: 2;
+  padding: 5px;
+  border-radius: 8px;
+
+  .tooltip-arrow {
+    width: 10px;
+    height: 10px;
+    background-color: #45548f1c;
+    position: absolute;
+    bottom: -5px;
+    transform: rotate(45deg);
+    z-index: -1;
+  }
 `;

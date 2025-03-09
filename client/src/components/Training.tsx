@@ -39,7 +39,7 @@ const Cell = ({ mode, verb, firstElemId }: { mode: "en" | "ru"; verb: VerbType; 
                 value={inputValue}
                 onChange={onInputChange}
                 onFocus={handleFocus}
-                autoFocus={verb.id === firstElemId}
+                autoFocus={firstElemId === verb.id}
               />
             </td>
             <td>{verb.translates.join(", ")}</td>
@@ -54,7 +54,7 @@ const Cell = ({ mode, verb, firstElemId }: { mode: "en" | "ru"; verb: VerbType; 
                 value={inputValue}
                 onChange={onInputChange}
                 onFocus={handleFocus}
-                autoFocus={verb.id === firstElemId}
+                autoFocus={firstElemId === verb.id}
               />
             </td>
           </>
@@ -114,7 +114,7 @@ const Training = ({
 }) => {
   const [mode, setMode] = useState<"en" | "ru">("en");
   const [isAllRight, setIsAllRight] = useState<boolean>(false);
-  const firstElemId = Math.min(...verbs.map((verb) => verb.id));
+  const firstElemId = verbs[0].id;
 
   const handleCheck = (verbs: VerbType[], mode: "en" | "ru") => {
     const inputs: HTMLInputElement[] = Array.from(document.querySelectorAll("input[type='text']"));

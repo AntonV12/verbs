@@ -33,7 +33,7 @@ export const parseFileContent = (content) => {
               example
                 .slice(1)
                 .replace(/(?<=.+)\.+$/, "")
-                .replace(/[а-я]/gi, "")
+                .replace(/[а-яё]/gi, "")
           );
         }
       }
