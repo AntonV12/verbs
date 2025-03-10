@@ -9,6 +9,7 @@ import TheEndComponent from "./components/TheEndComponent";
 import Reset from "./components/Reset";
 import ConfirmComponent from "./components/ConfirmComponent";
 import AlertComponent from "./components/AlertComponent";
+import FooterComponent from "./components/FooterComponent";
 
 export type VerbType = {
   id: number;
@@ -81,7 +82,7 @@ function App() {
       setShowAlert(true);
 
       const storedHashedVerbs = localStorage.getItem("hashedVerbs");
-      if (storedHashedVerbs) {
+      if (storedHashedVerbs && storedHashedVerbs.length === limit * 5) {
         const hashedVerbs = JSON.parse(storedHashedVerbs);
         setWordsList(shuffle(hashedVerbs));
       } else {
@@ -152,6 +153,7 @@ function App() {
           {renderContent()}
         </Main>
       )}
+      <FooterComponent />
     </Wrapper>
   );
 }

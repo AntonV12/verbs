@@ -3,6 +3,14 @@ import styled from "styled-components";
 export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+`;
+
+export const Footer = styled.footer`
+  margin-top: auto;
+  text-align: center;
+  padding: 5px 0;
+  color: #645555;
 `;
 
 export const StyledHeader = styled.header`
@@ -412,18 +420,20 @@ export const Tooltip = styled.div`
   top: -44px;
   left: -27px;
   width: 100px;
-  background-color: #45548f1c;
-  z-index: 2;
+  background-color: rgb(208, 214, 238);
   padding: 5px;
   border-radius: 8px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  z-index: 1;
 
   .tooltip-arrow {
     width: 10px;
     height: 10px;
-    background-color: #45548f1c;
+    background-color: rgb(208, 214, 238);
     position: absolute;
     bottom: -5px;
     transform: rotate(45deg);
-    z-index: -1;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    z-index: 0;
   }
 `;

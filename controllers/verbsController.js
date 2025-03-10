@@ -9,6 +9,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const parseVerbs = async (req, res) => {
   try {
+    const existingVerbs = await pool.execute("SELECT * FROM verbs");
+    if (existingVerbs[0].length) return res.status(200).json({ message: "Data already exists" });
     const sql = "INSERT INTO verbs (verb, translates, examples) VALUES (?, ?, ?)";
 
     const filePath = path.join(__dirname, "verbs");
@@ -24,7 +26,9 @@ export const parseVerbs = async (req, res) => {
       for (const elem of parsedData) {
         const { verb, translates, examples } = elem;
 
-        const examplesRes = examples.flatMap((sentence) => sentence.split(". ")).map((sentence) => sentence.trim());
+        const examplesRes = examples
+          .flatMap((sentence) => sentence.split(". "))
+          .map((sentence) => sentence.trim());
         const translatesRes = translates
           .map((translate) => translate.split(", "))
           .flat()
@@ -56,7 +60,9 @@ export const getVerbs = async (req, res) => {
 
       res.status(200).json({ results, length: length[0][0].count });
     } else {
-      const [results] = await pool.execute(`SELECT * FROM verbs LIMIT ${limit} OFFSET ${limit * (portion - 1)}`);
+      const [results] = await pool.execute(
+        `SELECT * FROM verbs LIMIT ${limit} OFFSET ${limit * (portion - 1)}`
+      );
       res.status(200).json({ results, length: length[0][0].count });
     }
   } catch (err) {
