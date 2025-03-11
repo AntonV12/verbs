@@ -15,12 +15,17 @@ const ConfirmComponent = ({
     };
   });
 
+  const handleConfirm = () => {
+    fn();
+    setShowConfirm(false);
+  };
+
   return (
     <Confirm>
       <div className="confirm">
         <p>Весь прогресс будет сброшен. Вы уверены?</p>
         <div>
-          <Button onClick={fn}>Да</Button>
+          <Button onClick={handleConfirm}>Да</Button>
           <Button onClick={() => setShowConfirm(false)}>Нет</Button>
         </div>
       </div>

@@ -1,9 +1,16 @@
 import { TheEnd, Start } from "./styles";
 
-const TheEndComponent = () => {
+const TheEndComponent = ({
+  setPortion,
+  setIsStarted,
+}: {
+  setPortion: React.Dispatch<React.SetStateAction<number>>;
+  setIsStarted: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const handleClear = () => {
     localStorage.clear();
-    window.location.reload();
+    setPortion(1);
+    setIsStarted(false);
   };
 
   return (

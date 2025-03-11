@@ -141,8 +141,12 @@ export const Main = styled.main`
     margin-bottom: 15px;
     border-collapse: collapse;
 
-    tr {
+    /* tr {
       border-bottom: 1px solid #ccc;
+    }
+
+    tr:first-child {
+      //border-top: 30px solid transparent;
     }
 
     tr:last-child {
@@ -150,11 +154,13 @@ export const Main = styled.main`
     }
 
     tr:nth-child(3n) td {
-      border-bottom: 10px solid transparent;
+      border-bottom: 20px solid transparent;
+      padding-bottom: 0;
     } 
 
     tr:nth-child(6n) td {
-      border-bottom: 20px solid transparent;
+      border-bottom: 40px solid transparent;
+      padding-bottom: 0;
     }
 
     tr:nth-child(12n+1),
@@ -197,6 +203,8 @@ export const Main = styled.main`
       padding: 15px 10px;
       font-size: 17px;
       color: #242121;
+      vertical-align: middle;
+      border: none;
     }
 
     td:first-child {
@@ -206,7 +214,7 @@ export const Main = styled.main`
 
     td:last-child {
       width: 70%;
-    }
+    } */
   }
 
     input {
@@ -281,6 +289,7 @@ export const Main = styled.main`
       opacity: 0;
       transition: opacity 0.5s ease, visibility 0.5s ease;
       z-index: 1;
+      user-select: none;
     }
 
     .show {

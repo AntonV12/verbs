@@ -21,6 +21,8 @@ const Cell = ({ mode, verb, firstElemId }: { mode: "en" | "ru"; verb: VerbType; 
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     e.target.style.removeProperty("background-color");
+    e.target.style.removeProperty("border");
+    e.target.dataset.correct = "";
   };
 
   useEffect(() => {
@@ -124,20 +126,26 @@ const Training = ({
 
       if (mode === "en") {
         if (value === verbs[index].verb) {
-          input.style.backgroundColor = "rgb(97, 228, 51)";
+          input.style.border = "2px solid rgb(51, 185, 2)";
+          input.style.backgroundColor = "rgba(51, 185, 2, 0.05)";
+          input.dataset.correct = "true";
         } else {
-          input.style.backgroundColor = "rgb(252, 86, 86)";
+          input.style.border = "2px solid red";
+          input.style.backgroundColor = "rgba(252, 86, 86, 0.05)";
         }
       } else {
         if (arraysMatch(value.split(", "), verbs[index].translates)) {
-          input.style.backgroundColor = "rgb(97, 228, 51)";
+          input.style.border = "2px solid rgb(51, 185, 2)";
+          input.style.backgroundColor = "rgba(51, 185, 2, 0.05)";
+          input.dataset.correct = "true";
         } else {
-          input.style.backgroundColor = "rgb(252, 86, 86)";
+          input.style.border = "2px solid red";
+          input.style.backgroundColor = "rgba(252, 86, 86, 0.05)";
         }
       }
     });
 
-    if (inputs.every((input) => input.style.backgroundColor === "rgb(97, 228, 51)")) {
+    if (inputs.every((input) => input.dataset.correct === "true")) {
       setIsAllRight(true);
     }
   };
