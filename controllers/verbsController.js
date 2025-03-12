@@ -4,6 +4,9 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 import { shuffle } from "../middlewares/shuffleArray.js";
+import cryptoJS from "crypto-js";
+
+const secretKey = "secretKey";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -53,18 +56,17 @@ export const getVerbs = async (req, res) => {
 
   try {
     const length = await pool.execute("SELECT COUNT(*) as count FROM verbs");
+    let results;
     if (isExam) {
       const minus = +portion - 5;
       const start = (+portion - 5) * (+limit + 1) - minus;
-      const [results] = await pool.execute(`SELECT * FROM verbs LIMIT ${limit * 5} OFFSET ${start}`);
-
-      res.status(200).json({ results, length: length[0][0].count });
+      [results] = await pool.execute(`SELECT * FROM verbs LIMIT ${limit * 5} OFFSET ${start}`);
     } else {
-      const [results] = await pool.execute(
-        `SELECT * FROM verbs LIMIT ${limit} OFFSET ${limit * (portion - 1)}`
-      );
-      res.status(200).json({ results, length: length[0][0].count });
+      [results] = await pool.execute(`SELECT * FROM verbs LIMIT ${limit} OFFSET ${limit * (portion - 1)}`);
     }
+
+    const encryptedResults = cryptoJS.AES.encrypt(JSON.stringify(results), secretKey).toString();
+    res.status(200).json({ results: encryptedResults, length: length[0][0].count });
   } catch (err) {
     console.error("Ошибка:", err);
     res.status(500).json({ error: "Ошибка сервера" });

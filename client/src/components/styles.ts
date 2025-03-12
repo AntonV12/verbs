@@ -139,110 +139,126 @@ export const Main = styled.main`
   .table {
     width: 100%;
     margin-bottom: 15px;
-    border-collapse: collapse;
+    //border-collapse: collapse;
 
-    /* tr {
-      border-bottom: 1px solid #ccc;
+    tr {
+      &:not(:last-child) {
+        border-bottom: 1px solid #ccc;
+      }
+      display: flex;
+
+      @media screen and (max-width: 600px) {
+        flex-direction: column;
+      }
+
+      box-shadow: 0 0 5px #ccc;
+
+      td {
+        padding: 15px 10px;
+        font-size: 17px;
+        color: #242121;
+        border: none;
+        display: flex;
+        align-items: center;
+
+        &:first-child {
+          font-weight: bold;
+          width: 30%;
+
+          @media screen and (max-width: 600px) {
+            width: 90%;
+            justify-content: center;
+            text-align: center;
+          }
+
+          @media screen and (min-width: 600px) and (max-width: 1000px) {
+            width: 50%;
+          }
+        }
+
+        &:last-child {
+          width: 70%;
+
+          @media screen and (max-width: 600px) {
+            width: 90%;
+            justify-content: center;
+            text-align: center;
+            padding-top: 0;
+          }
+
+          @media screen and (min-width: 600px) and (max-width: 1000px) {
+            width: 50%;
+          }
+        }
+      }
     }
 
-    tr:first-child {
-      //border-top: 30px solid transparent;
+    tr:nth-child(3n):not(:last-child) {
+      margin-bottom: 12px;
     }
 
-    tr:last-child {
+    tr:nth-child(6n):not(:last-child) {
+      margin-bottom: 30px;
       border-bottom: none;
     }
 
-    tr:nth-child(3n) td {
-      border-bottom: 20px solid transparent;
-      padding-bottom: 0;
-    } 
-
-    tr:nth-child(6n) td {
-      border-bottom: 40px solid transparent;
-      padding-bottom: 0;
+    tr:nth-child(12n + 1),
+    tr:nth-child(12n + 2),
+    tr:nth-child(12n + 3),
+    tr:nth-child(12n + 4),
+    tr:nth-child(12n + 5),
+    tr:nth-child(12n + 6) {
+      background-color: rgba(69, 84, 143, 0.06);
     }
 
-    tr:nth-child(12n+1),
-    tr:nth-child(12n+2),
-    tr:nth-child(12n+3),
-    tr:nth-child(12n+4),
-    tr:nth-child(12n+5),
-    tr:nth-child(12n+6) {
-      background-color:rgba(69, 84, 143, 0.06);
-    }
-
-    tr:nth-child(12n+7),
-    tr:nth-child(12n+8),
-    tr:nth-child(12n+9),
-    tr:nth-child(12n+10),
-    tr:nth-child(12n+11),
-    tr:nth-child(12n+12) {
+    tr:nth-child(12n + 7),
+    tr:nth-child(12n + 8),
+    tr:nth-child(12n + 9),
+    tr:nth-child(12n + 10),
+    tr:nth-child(12n + 11),
+    tr:nth-child(12n + 12) {
       background-color: #ffffff;
     }
 
-    tr:nth-child(12n+1) td {
-      &:first-child {
-        border-radius: 10px 0 0 0;
-      }
-      &:last-child {
-        border-radius: 0 10px 0 0;
-      }
+    tr:nth-child(6n + 1) {
+      border-radius: 10px 10px 0 0;
     }
 
-    tr:nth-child(12n+6) td {
-      &:first-child {
-        border-radius: 0 0 0 10px;
-      }
-      &:last-child {
-        border-radius: 0 0 10px 0;
-      }
+    tr:nth-child(6n + 6) {
+      border-radius: 0 0 10px 10px;
     }
-
-    td {
-      padding: 15px 10px;
-      font-size: 17px;
-      color: #242121;
-      vertical-align: middle;
-      border: none;
-    }
-
-    td:first-child {
-      font-weight: bold;
-      width: 30%;
-    }
-
-    td:last-child {
-      width: 70%;
-    } */
   }
 
-    input {
-      outline: none;
-      padding: 10px 5px;
-      font-size: 17px;
-      border: 2px solid gray;
-      transition: 1s ease all;
-      border-radius: 3px;
+  input {
+    outline: none;
+    padding: 10px 5px;
+    font-size: 17px;
+    border: 2px solid gray;
+    transition: 1s ease all;
+    border-radius: 10px;
 
-      &:focus {
-        outline: none;
-        border: 2px solid #45548f;
+    &:focus {
+      outline: none;
+      border: 2px solid #45548f;
+    }
+
+    &.en {
+      font-weight: bold;
+      width: 90%;
+      text-align: right;
+
+      @media screen and (max-width: 600px) {
+        text-align: center;
       }
     }
 
-    input.en {
-      font-weight: bold;
-      text-align: right;
-      width: 90%;
-    }
-
-    input.ru {
+    .ru {
       text-align: left;
       width: 100%;
       box-sizing: border-box;
     }
   }
+  //}
 
   .control {
     text-align: right;
@@ -274,10 +290,8 @@ export const Main = styled.main`
     position: relative;
     height: fit-content;
 
-    
-
     .text {
-      margin: 0; 
+      margin: 0;
       border: 2px dashed gray;
       padding: 10px;
       text-align: justify;
@@ -325,7 +339,7 @@ export const Main = styled.main`
       text-decoration: #f73838 underline;
       background-color: #ffcbcb;
     }
-    
+
     .correct {
       text-decoration: #28a745 underline;
       background-color: #d4edda;

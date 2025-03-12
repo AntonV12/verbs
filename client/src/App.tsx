@@ -89,8 +89,11 @@ function App() {
         fetchVerbs
           .then((res) => res.json())
           .then((data) => {
-            if (!hashedVerbs.some((verb) => data.results.some((v: VerbType) => v.id === verb.id))) {
-              const newHashedVerbs = [...hashedVerbs, ...data.results];
+            const bytes = CryptoJS.AES.decrypt(data.results, secretKey);
+            const decryptedVerbs = bytes && JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+            if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
+              const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
               const encryptedVerbs = CryptoJS.AES.encrypt(
                 JSON.stringify(newHashedVerbs),
                 secretKey
@@ -98,7 +101,7 @@ function App() {
               localStorage.setItem("hashedVerbs", encryptedVerbs);
             }
 
-            setWordsList(data.results);
+            setWordsList(decryptedVerbs);
             setVerbsLength(data.length);
             setRequestStatus("succeeded");
           })
@@ -118,8 +121,11 @@ function App() {
           fetchVerbs
             .then((res) => res.json())
             .then((data) => {
-              if (!hashedVerbs.some((verb) => data.results.some((v: VerbType) => v.id === verb.id))) {
-                const newHashedVerbs = [...hashedVerbs, ...data.results];
+              const bytes = CryptoJS.AES.decrypt(data.results, secretKey);
+              const decryptedVerbs = bytes && JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+              if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
+                const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
                 const encryptedVerbs = CryptoJS.AES.encrypt(
                   JSON.stringify(newHashedVerbs),
                   secretKey
@@ -127,7 +133,7 @@ function App() {
                 localStorage.setItem("hashedVerbs", encryptedVerbs);
               }
 
-              setWordsList(shuffle(data.results));
+              setWordsList(shuffle(decryptedVerbs));
               setRequestStatus("succeeded");
             })
             .catch((err) => console.error(err));
