@@ -1,7 +1,15 @@
 import { VerbType } from "../App";
 import { useState, useRef, useEffect } from "react";
 
-const Span = ({ verb, isChecking, textValue }: { verb: VerbType; isChecking: boolean; textValue: string }) => {
+const Span = ({
+  verb,
+  isChecking,
+  textValue,
+}: {
+  verb: VerbType;
+  isChecking: boolean;
+  textValue: string;
+}) => {
   const res = verb.examples.map((example) => {
     const isMissed = !textValue.toLowerCase().includes(example.toLowerCase());
     if (example.endsWith("?") || example.endsWith("!")) {
@@ -30,6 +38,7 @@ const Retelling = ({
   isExam,
   setIsExam,
   setHashedVerbs,
+  setCorrectVerbs,
 }: {
   verbs: VerbType[];
   portion: number;
@@ -38,6 +47,7 @@ const Retelling = ({
   isExam: boolean;
   setIsExam: React.Dispatch<React.SetStateAction<boolean>>;
   setHashedVerbs: React.Dispatch<React.SetStateAction<VerbType[]>>;
+  setCorrectVerbs: React.Dispatch<React.SetStateAction<number[]>>;
 }) => {
   const [isShowArea, setIsShowArea] = useState<boolean>(false);
   const [isShowText, setIsShowText] = useState<boolean>(true);
@@ -94,10 +104,13 @@ const Retelling = ({
       }
 
       setIsChecking(false);
+      setCorrectVerbs([]);
       setStage(1);
       localStorage.setItem("stage", "1");
     }
   };
+
+  console.log(verbs);
 
   return (
     <>

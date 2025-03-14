@@ -252,7 +252,7 @@ export const Main = styled.main`
       }
     }
 
-    .ru {
+    &.ru {
       text-align: left;
       width: 100%;
       box-sizing: border-box;

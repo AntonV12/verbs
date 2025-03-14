@@ -30,16 +30,13 @@ const shuffle = (array: VerbType[]): VerbType[] => {
   return array;
 };
 
-/* const fetchVerbs = fetch("/verbs/fetch")
-  .then((res) => res.json())
-  .catch((err) => console.error(err)); */
-
 function App() {
-  const limit: number = 18;
+  const limit: number = 3;
   //const verbs: VerbType[] = use(fetchVerbs);
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [stage, setStage] = useState<number>(0);
   const [portion, setPortion] = useState<number>(1);
+  const [initialWordsList, setInitialWordsList] = useState<VerbType[]>([]);
   const [wordsList, setWordsList] = useState<VerbType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [verbsLength, setVerbsLength] = useState<number>(0); /* verbs.length / limit */
@@ -48,6 +45,8 @@ function App() {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [hashedVerbs, setHashedVerbs] = useState<VerbType[]>([]);
   const [requestStatus, setRequestStatus] = useState<"idle" | "pending" | "succeeded" | "failed">("idle");
+  const [correctVerbs, setCorrectVerbs] = useState<number[]>([]);
+  const filteredWordsList: VerbType[] = wordsList.filter((word) => !correctVerbs.includes(word.id));
 
   useEffect(() => {
     const savedPortion = localStorage.getItem("portion");
@@ -55,6 +54,7 @@ function App() {
     const savedIsStarted = localStorage.getItem("isStarted");
     const savedIsExam = localStorage.getItem("isExam");
     const encryptedVerbs = localStorage.getItem("hashedVerbs");
+    const savedCorrectVerbs = localStorage.getItem("correctVerbs");
 
     if (encryptedVerbs) {
       try {
@@ -76,6 +76,7 @@ function App() {
     if (savedStage) setStage(Number(savedStage));
     if (savedIsStarted) setIsStarted(JSON.parse(savedIsStarted));
     if (savedIsExam) setIsExam(JSON.parse(savedIsExam));
+    if (savedCorrectVerbs) setCorrectVerbs(JSON.parse(savedCorrectVerbs));
     setIsLoading(false);
   }, []);
 
@@ -101,6 +102,7 @@ function App() {
               localStorage.setItem("hashedVerbs", encryptedVerbs);
             }
 
+            setInitialWordsList(decryptedVerbs);
             setWordsList(decryptedVerbs);
             setVerbsLength(data.length);
             setRequestStatus("succeeded");
@@ -147,9 +149,12 @@ function App() {
 
   const handleClear = () => {
     localStorage.clear();
+    setWordsList(initialWordsList);
     //window.location.reload();
     setIsStarted(false);
   };
+
+  console.log(filteredWordsList);
 
   const renderContent = () => {
     //if (wordsList.length === 0) return null;
@@ -157,20 +162,28 @@ function App() {
       return wordsList.length === 0 ? (
         <TheEndComponent setPortion={setPortion} setIsStarted={setIsStarted} />
       ) : (
-        <Learning verbs={wordsList} portion={portion} stage={stage} setStage={setStage} />
+        <Learning verbs={filteredWordsList} portion={portion} stage={stage} setStage={setStage} />
       );
     } else if (stage === 2) {
-      return <Training verbs={wordsList} setStage={setStage} />;
+      return (
+        <Training
+          verbs={filteredWordsList}
+          setStage={setStage}
+          setWordsList={setWordsList}
+          initialWordsList={initialWordsList}
+        />
+      );
     } else if (stage === 3) {
       return (
         <Retelling
-          verbs={wordsList}
+          verbs={initialWordsList}
           portion={portion}
           setPortion={setPortion}
           setStage={setStage}
           isExam={isExam}
           setIsExam={setIsExam}
           setHashedVerbs={setHashedVerbs}
+          setCorrectVerbs={setCorrectVerbs}
         />
       );
     }

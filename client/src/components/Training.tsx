@@ -1,5 +1,5 @@
 import { VerbType } from "../App";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 function arraysMatch(arr1: string[], arr2: string[]): boolean {
   return arr1.every((word) =>
@@ -38,7 +38,7 @@ const Cell = ({ mode, verb, firstElemId }: { mode: "en" | "ru"; verb: VerbType; 
               <input
                 type="text"
                 className={mode}
-                value={inputValue}
+                value={/* inputValue */ verb.verb}
                 onChange={onInputChange}
                 onFocus={handleFocus}
                 autoFocus={firstElemId === verb.id}
@@ -52,7 +52,7 @@ const Cell = ({ mode, verb, firstElemId }: { mode: "en" | "ru"; verb: VerbType; 
             <td>
               <input
                 type="text"
-                className={mode}
+                className={mode ? mode : ""}
                 value={inputValue}
                 onChange={onInputChange}
                 onFocus={handleFocus}
@@ -74,6 +74,9 @@ const ControlButton = ({
   setIsAllRight,
   setMode,
   setStage,
+  wrongVerbs,
+  setWordsList,
+  initialWordsList,
 }: {
   handleCheck: (verbs: VerbType[], mode: "en" | "ru") => void;
   verbs: VerbType[];
@@ -82,27 +85,55 @@ const ControlButton = ({
   setIsAllRight: React.Dispatch<React.SetStateAction<boolean>>;
   setMode: React.Dispatch<React.SetStateAction<"en" | "ru">>;
   setStage: React.Dispatch<React.SetStateAction<number>>;
+  wrongVerbs: VerbType[];
+  setWordsList: React.Dispatch<React.SetStateAction<VerbType[]>>;
+  initialWordsList: VerbType[];
 }) => {
-  const handleClick = () => {
-    handleCheck(verbs, mode);
+  const [isGoAhead, setIsGoAhead] = useState<boolean>(false);
 
-    if (mode === "en") {
-      if (isAllRight) {
-        setIsAllRight(false);
-        setMode("ru");
+  const handleClick = () => {
+    setIsGoAhead(true);
+
+    if (!isGoAhead) {
+      handleCheck(verbs, mode);
+    }
+
+    if (isGoAhead) {
+      if (mode === "en") {
+        if (isAllRight) {
+          setIsAllRight(false);
+          localStorage.setItem("correctVerbs", JSON.stringify([]));
+          setWordsList(initialWordsList);
+          setMode("ru");
+          localStorage.setItem("mode", "ru");
+        } else {
+          setStage(1);
+          localStorage.setItem("stage", "1");
+          setWordsList(wrongVerbs);
+        }
+      } else {
+        if (isAllRight) {
+          setIsAllRight(false);
+          localStorage.setItem("stage", "3");
+          setMode("en");
+          localStorage.setItem("mode", "en");
+          localStorage.setItem("correctVerbs", JSON.stringify([]));
+          setWordsList(initialWordsList);
+          setStage(3);
+        } else {
+          setStage(1);
+          localStorage.setItem("stage", "1");
+          setWordsList(wrongVerbs);
+        }
       }
-    } else {
-      if (isAllRight) {
-        setIsAllRight(false);
-        setStage(3);
-        localStorage.setItem("stage", String(3));
-      }
+
+      setIsGoAhead(false);
     }
   };
 
   return (
     <button className="button" onClick={handleClick}>
-      {isAllRight ? "верно, далее" : "проверить ввод слов"}
+      {isGoAhead ? "далее" : "проверить ввод слов"}
     </button>
   );
 };
@@ -110,13 +141,18 @@ const ControlButton = ({
 const Training = ({
   verbs,
   setStage,
+  setWordsList,
+  initialWordsList,
 }: {
   verbs: VerbType[];
   setStage: React.Dispatch<React.SetStateAction<number>>;
+  setWordsList: React.Dispatch<React.SetStateAction<VerbType[]>>;
+  initialWordsList: VerbType[];
 }) => {
-  const [mode, setMode] = useState<"en" | "ru">("en");
+  const [mode, setMode] = useState<"en" | "ru">((localStorage.getItem("mode") as "en" | "ru") || "en");
   const [isAllRight, setIsAllRight] = useState<boolean>(false);
   const firstElemId = verbs[0].id;
+  const [wrongVerbs, setWrongVerbs] = useState<VerbType[]>([]);
 
   const handleCheck = (verbs: VerbType[], mode: "en" | "ru") => {
     const inputs: HTMLInputElement[] = Array.from(document.querySelectorAll("input[type='text']"));
@@ -147,6 +183,28 @@ const Training = ({
 
     if (inputs.every((input) => input.dataset.correct === "true")) {
       setIsAllRight(true);
+    } else {
+      const wrongInputs: HTMLInputElement[] = inputs.filter((input) => input.dataset.correct !== "true");
+      const newWordsList: VerbType[] = wrongInputs.map((input) => {
+        const verb = verbs[inputs.indexOf(input)];
+        return {
+          verb: verb.verb,
+          translates: verb.translates,
+          id: verb.id,
+          examples: verb.examples,
+        };
+      });
+
+      const correctWordsIds: number[] = verbs
+        .filter((verb) => !newWordsList.some((word) => word.id === verb.id))
+        .map((verb) => verb.id);
+      const savedCorrectVerbs = localStorage.getItem("correctVerbs");
+      if (savedCorrectVerbs) {
+        const parsedCorrectVerbs = JSON.parse(savedCorrectVerbs) as number[];
+        correctWordsIds.push(...parsedCorrectVerbs);
+      }
+      localStorage.setItem("correctVerbs", JSON.stringify(correctWordsIds));
+      setWrongVerbs(newWordsList);
     }
   };
 
@@ -171,6 +229,9 @@ const Training = ({
           setIsAllRight={setIsAllRight}
           setMode={setMode}
           setStage={setStage}
+          wrongVerbs={wrongVerbs}
+          setWordsList={setWordsList}
+          initialWordsList={initialWordsList}
         />
       </div>
     </>
