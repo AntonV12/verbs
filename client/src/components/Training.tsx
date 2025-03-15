@@ -38,7 +38,7 @@ const Cell = ({ mode, verb, firstElemId }: { mode: "en" | "ru"; verb: VerbType; 
               <input
                 type="text"
                 className={mode}
-                value={/* inputValue */ verb.verb}
+                value={inputValue}
                 onChange={onInputChange}
                 onFocus={handleFocus}
                 autoFocus={firstElemId === verb.id}

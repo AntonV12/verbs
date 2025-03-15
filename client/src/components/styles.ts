@@ -139,7 +139,6 @@ export const Main = styled.main`
   .table {
     width: 100%;
     margin-bottom: 15px;
-    //border-collapse: collapse;
 
     tr {
       &:not(:last-child) {
@@ -224,7 +223,8 @@ export const Main = styled.main`
       border-radius: 10px 10px 0 0;
     }
 
-    tr:nth-child(6n + 6) {
+    tr:nth-child(6n + 6),
+    tr:last-child {
       border-radius: 0 0 10px 10px;
     }
   }
@@ -258,7 +258,6 @@ export const Main = styled.main`
       box-sizing: border-box;
     }
   }
-  //}
 
   .control {
     text-align: right;

@@ -31,15 +31,14 @@ const shuffle = (array: VerbType[]): VerbType[] => {
 };
 
 function App() {
-  const limit: number = 3;
-  //const verbs: VerbType[] = use(fetchVerbs);
+  const limit: number = 18;
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [stage, setStage] = useState<number>(0);
   const [portion, setPortion] = useState<number>(1);
   const [initialWordsList, setInitialWordsList] = useState<VerbType[]>([]);
   const [wordsList, setWordsList] = useState<VerbType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [verbsLength, setVerbsLength] = useState<number>(0); /* verbs.length / limit */
+  const [verbsLength, setVerbsLength] = useState<number>(0);
   const [isExam, setIsExam] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -95,10 +94,7 @@ function App() {
 
             if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
               const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
-              const encryptedVerbs = CryptoJS.AES.encrypt(
-                JSON.stringify(newHashedVerbs),
-                secretKey
-              ).toString();
+              const encryptedVerbs = CryptoJS.AES.encrypt(JSON.stringify(newHashedVerbs), secretKey).toString();
               localStorage.setItem("hashedVerbs", encryptedVerbs);
             }
 
@@ -110,6 +106,8 @@ function App() {
           .catch((err) => console.error(err));
       } else {
         setShowAlert(true);
+        localStorage.setItem("correctVerbs", JSON.stringify([]));
+        setCorrectVerbs([]);
 
         const encryptedVerbs = localStorage.getItem("hashedVerbs");
         const bytes = encryptedVerbs ? CryptoJS.AES.decrypt(encryptedVerbs, secretKey) : null;
@@ -128,13 +126,11 @@ function App() {
 
               if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
                 const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
-                const encryptedVerbs = CryptoJS.AES.encrypt(
-                  JSON.stringify(newHashedVerbs),
-                  secretKey
-                ).toString();
+                const encryptedVerbs = CryptoJS.AES.encrypt(JSON.stringify(newHashedVerbs), secretKey).toString();
                 localStorage.setItem("hashedVerbs", encryptedVerbs);
               }
 
+              setInitialWordsList(decryptedVerbs);
               setWordsList(shuffle(decryptedVerbs));
               setRequestStatus("succeeded");
             })
@@ -149,18 +145,15 @@ function App() {
 
   const handleClear = () => {
     localStorage.clear();
+    setIsExam(false);
     setWordsList(initialWordsList);
-    //window.location.reload();
     setIsStarted(false);
   };
 
-  console.log(filteredWordsList);
-
   const renderContent = () => {
-    //if (wordsList.length === 0) return null;
     if (stage === 1) {
       return wordsList.length === 0 ? (
-        <TheEndComponent setPortion={setPortion} setIsStarted={setIsStarted} />
+        <TheEndComponent setPortion={setPortion} setIsStarted={setIsStarted} setIsExam={setIsExam} />
       ) : (
         <Learning verbs={filteredWordsList} portion={portion} stage={stage} setStage={setStage} />
       );

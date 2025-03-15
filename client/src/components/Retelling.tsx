@@ -1,15 +1,7 @@
 import { VerbType } from "../App";
 import { useState, useRef, useEffect } from "react";
 
-const Span = ({
-  verb,
-  isChecking,
-  textValue,
-}: {
-  verb: VerbType;
-  isChecking: boolean;
-  textValue: string;
-}) => {
+const Span = ({ verb, isChecking, textValue }: { verb: VerbType; isChecking: boolean; textValue: string }) => {
   const res = verb.examples.map((example) => {
     const isMissed = !textValue.toLowerCase().includes(example.toLowerCase());
     if (example.endsWith("?") || example.endsWith("!")) {
@@ -109,8 +101,6 @@ const Retelling = ({
       localStorage.setItem("stage", "1");
     }
   };
-
-  console.log(verbs);
 
   return (
     <>

@@ -3,12 +3,15 @@ import { TheEnd, Start } from "./styles";
 const TheEndComponent = ({
   setPortion,
   setIsStarted,
+  setIsExam,
 }: {
   setPortion: React.Dispatch<React.SetStateAction<number>>;
   setIsStarted: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsExam: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const handleClear = () => {
     localStorage.clear();
+    setIsExam(false);
     setPortion(1);
     setIsStarted(false);
   };
