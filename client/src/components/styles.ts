@@ -138,7 +138,7 @@ export const Main = styled.main`
 
   .table {
     width: 100%;
-    margin-bottom: 15px;
+    //margin-bottom: 10px;
 
     tr {
       &:not(:last-child) {
@@ -226,6 +226,26 @@ export const Main = styled.main`
     tr:nth-child(6n + 6),
     tr:last-child {
       border-radius: 0 0 10px 10px;
+    }
+  }
+
+  p.message {
+    height: 16px;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 1s ease;
+
+    &.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    @media screen and (max-width: 380px) {
+      font-size: 14px;
     }
   }
 

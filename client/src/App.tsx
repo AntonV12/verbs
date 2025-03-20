@@ -94,7 +94,10 @@ function App() {
 
             if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
               const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
-              const encryptedVerbs = CryptoJS.AES.encrypt(JSON.stringify(newHashedVerbs), secretKey).toString();
+              const encryptedVerbs = CryptoJS.AES.encrypt(
+                JSON.stringify(newHashedVerbs),
+                secretKey
+              ).toString();
               localStorage.setItem("hashedVerbs", encryptedVerbs);
             }
 
@@ -126,7 +129,10 @@ function App() {
 
               if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
                 const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
-                const encryptedVerbs = CryptoJS.AES.encrypt(JSON.stringify(newHashedVerbs), secretKey).toString();
+                const encryptedVerbs = CryptoJS.AES.encrypt(
+                  JSON.stringify(newHashedVerbs),
+                  secretKey
+                ).toString();
                 localStorage.setItem("hashedVerbs", encryptedVerbs);
               }
 
@@ -146,6 +152,7 @@ function App() {
   const handleClear = () => {
     localStorage.clear();
     setIsExam(false);
+    setCorrectVerbs([]);
     setWordsList(initialWordsList);
     setIsStarted(false);
   };
@@ -164,6 +171,7 @@ function App() {
           setStage={setStage}
           setWordsList={setWordsList}
           initialWordsList={initialWordsList}
+          setCorrectVerbs={setCorrectVerbs}
         />
       );
     } else if (stage === 3) {

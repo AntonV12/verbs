@@ -77,6 +77,8 @@ const ControlButton = ({
   wrongVerbs,
   setWordsList,
   initialWordsList,
+  setMessage,
+  setCorrectVerbs,
 }: {
   handleCheck: (verbs: VerbType[], mode: "en" | "ru") => void;
   verbs: VerbType[];
@@ -88,8 +90,26 @@ const ControlButton = ({
   wrongVerbs: VerbType[];
   setWordsList: React.Dispatch<React.SetStateAction<VerbType[]>>;
   initialWordsList: VerbType[];
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
+  setCorrectVerbs: React.Dispatch<React.SetStateAction<number[]>>;
 }) => {
   const [isGoAhead, setIsGoAhead] = useState<boolean>(false);
+  const [wrongWord, setWrongWord] = useState<string>("");
+
+  useEffect(() => {
+    if (isGoAhead) {
+      if (!isAllRight) {
+        if (wrongVerbs.length === 1) {
+          setWrongWord("глагол");
+        } else if (wrongVerbs.length > 1 && wrongVerbs.length < 5) {
+          setWrongWord("глагола");
+        } else {
+          setWrongWord("глаголов");
+        }
+        setMessage(`Необходимо доучить ещё ${wrongVerbs.length} ${wrongWord}`);
+      }
+    }
+  }, [wrongVerbs, isAllRight, isGoAhead, setMessage, wrongWord]);
 
   const handleClick = () => {
     setIsGoAhead(true);
@@ -104,6 +124,7 @@ const ControlButton = ({
           setIsAllRight(false);
           localStorage.setItem("correctVerbs", JSON.stringify([]));
           setWordsList(initialWordsList);
+          setCorrectVerbs([]);
           setMode("ru");
           localStorage.setItem("mode", "ru");
         } else {
@@ -116,9 +137,10 @@ const ControlButton = ({
           setIsAllRight(false);
           localStorage.setItem("stage", "3");
           setMode("en");
+          setWordsList(initialWordsList);
+          setCorrectVerbs([]);
           localStorage.setItem("mode", "en");
           localStorage.setItem("correctVerbs", JSON.stringify([]));
-          setWordsList(initialWordsList);
           setStage(3);
         } else {
           setStage(1);
@@ -126,8 +148,8 @@ const ControlButton = ({
           setWordsList(wrongVerbs);
         }
       }
-
       setIsGoAhead(false);
+      setMessage("");
     }
   };
 
@@ -143,16 +165,19 @@ const Training = ({
   setStage,
   setWordsList,
   initialWordsList,
+  setCorrectVerbs,
 }: {
   verbs: VerbType[];
   setStage: React.Dispatch<React.SetStateAction<number>>;
   setWordsList: React.Dispatch<React.SetStateAction<VerbType[]>>;
   initialWordsList: VerbType[];
+  setCorrectVerbs: React.Dispatch<React.SetStateAction<number[]>>;
 }) => {
   const [mode, setMode] = useState<"en" | "ru">((localStorage.getItem("mode") as "en" | "ru") || "en");
   const [isAllRight, setIsAllRight] = useState<boolean>(false);
   const firstElemId = verbs[0].id;
   const [wrongVerbs, setWrongVerbs] = useState<VerbType[]>([]);
+  const [message, setMessage] = useState<string>("");
 
   const handleCheck = (verbs: VerbType[], mode: "en" | "ru") => {
     const inputs: HTMLInputElement[] = Array.from(document.querySelectorAll("input[type='text']"));
@@ -220,6 +245,9 @@ const Training = ({
           })}
         </tbody>
       </table>
+      <p className={`message ${message ? "visible" : ""}`} style={{ color: isAllRight ? "#28a745" : "red" }}>
+        <strong>{message}</strong>
+      </p>
       <div className="control">
         <ControlButton
           handleCheck={handleCheck}
@@ -232,6 +260,8 @@ const Training = ({
           wrongVerbs={wrongVerbs}
           setWordsList={setWordsList}
           initialWordsList={initialWordsList}
+          setMessage={setMessage}
+          setCorrectVerbs={setCorrectVerbs}
         />
       </div>
     </>

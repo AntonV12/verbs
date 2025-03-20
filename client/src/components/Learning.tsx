@@ -18,7 +18,7 @@ const Learning = ({
     <>
       <h2>Режим заучивания</h2>
       <p className="task">Выучи следующие слова:</p>
-      <table className="table">
+      <table className="table" style={{ marginBottom: "26px" }}>
         <tbody>
           {verbs.map((verb) => {
             return (
