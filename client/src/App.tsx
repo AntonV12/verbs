@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, JSX } from "react";
 import { Main, Wrapper, Loader, MainHeader } from "./components/styles";
 import Header from "./components/Header";
 import Learning from "./components/Learning";
@@ -79,6 +79,16 @@ function App() {
     setIsLoading(false);
   }, []);
 
+  const decryptData = (data: string, secretKey: string): VerbType[] => {
+    const bytes = CryptoJS.AES.decrypt(data, secretKey);
+    const decryptedVerbs = bytes && JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decryptedVerbs;
+  };
+
+  const encryptData = (data: VerbType[]): string => {
+    return CryptoJS.AES.encrypt(JSON.stringify(data), secretKey).toString();
+  };
+
   useEffect(() => {
     setRequestStatus("pending");
     if (isLoading) return;
@@ -89,15 +99,11 @@ function App() {
         fetchVerbs
           .then((res) => res.json())
           .then((data) => {
-            const bytes = CryptoJS.AES.decrypt(data.results, secretKey);
-            const decryptedVerbs = bytes && JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            const decryptedVerbs = decryptData(data.results, secretKey);
 
             if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
               const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
-              const encryptedVerbs = CryptoJS.AES.encrypt(
-                JSON.stringify(newHashedVerbs),
-                secretKey
-              ).toString();
+              const encryptedVerbs = encryptData(newHashedVerbs);
               localStorage.setItem("hashedVerbs", encryptedVerbs);
             }
 
@@ -113,8 +119,7 @@ function App() {
         setCorrectVerbs([]);
 
         const encryptedVerbs = localStorage.getItem("hashedVerbs");
-        const bytes = encryptedVerbs ? CryptoJS.AES.decrypt(encryptedVerbs, secretKey) : null;
-        const decryptedVerbs = bytes && JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        const decryptedVerbs = encryptedVerbs ? decryptData(encryptedVerbs, secretKey) : [];
 
         if (encryptedVerbs && decryptedVerbs.length === limit * 5) {
           setWordsList(shuffle(decryptedVerbs));
@@ -124,15 +129,11 @@ function App() {
           fetchVerbs
             .then((res) => res.json())
             .then((data) => {
-              const bytes = CryptoJS.AES.decrypt(data.results, secretKey);
-              const decryptedVerbs = bytes && JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+              const decryptedVerbs = decryptData(data.results, secretKey);
 
               if (!hashedVerbs.some((verb) => decryptedVerbs.some((v: VerbType) => v.id === verb.id))) {
                 const newHashedVerbs = [...hashedVerbs, ...decryptedVerbs];
-                const encryptedVerbs = CryptoJS.AES.encrypt(
-                  JSON.stringify(newHashedVerbs),
-                  secretKey
-                ).toString();
+                const encryptedVerbs = encryptData(newHashedVerbs);
                 localStorage.setItem("hashedVerbs", encryptedVerbs);
               }
 
@@ -157,15 +158,15 @@ function App() {
     setIsStarted(false);
   };
 
-  const renderContent = () => {
-    if (stage === 1) {
-      return wordsList.length === 0 ? (
-        <TheEndComponent setPortion={setPortion} setIsStarted={setIsStarted} setIsExam={setIsExam} />
-      ) : (
-        <Learning verbs={filteredWordsList} portion={portion} stage={stage} setStage={setStage} />
-      );
-    } else if (stage === 2) {
-      return (
+  const renderContent = (): JSX.Element => {
+    const components: { [key: number]: JSX.Element } = {
+      1:
+        wordsList.length === 0 ? (
+          <TheEndComponent setPortion={setPortion} setIsStarted={setIsStarted} setIsExam={setIsExam} />
+        ) : (
+          <Learning verbs={filteredWordsList} portion={portion} stage={stage} setStage={setStage} />
+        ),
+      2: (
         <Training
           verbs={filteredWordsList}
           setStage={setStage}
@@ -173,9 +174,8 @@ function App() {
           initialWordsList={initialWordsList}
           setCorrectVerbs={setCorrectVerbs}
         />
-      );
-    } else if (stage === 3) {
-      return (
+      ),
+      3: (
         <Retelling
           verbs={initialWordsList}
           portion={portion}
@@ -186,9 +186,9 @@ function App() {
           setHashedVerbs={setHashedVerbs}
           setCorrectVerbs={setCorrectVerbs}
         />
-      );
-    }
-    return null;
+      ),
+    };
+    return components[stage] || null;
   };
 
   if (requestStatus === "pending") {
